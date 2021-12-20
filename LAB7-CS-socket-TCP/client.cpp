@@ -80,9 +80,9 @@ void receiveThread(SOCKET client) {
 		cout << "------------------------------------------------" << endl;
 		cout << "Package No. " << package_num << endl;
 		cout << "Receive Message: " << endl;
-		cout << "Type: " << REQUEST_STRING[msg.OPTION] << endl;
-		cout << "Destination: " << msg.DESTINATION << endl;
-		cout << "Message: " << msg.MSG << endl;
+		cout << "* Type: " << REQUEST_STRING[msg.OPTION] << endl;
+		cout << "* Destination: " << msg.DESTINATION << endl;
+		cout << "* Message: " << msg.MSG << endl;
 		cout << "------------ end of message -------------" << endl;
 
 		if (msg.OPTION == SHUTDOWN) { // deal with shutdown option
@@ -109,7 +109,7 @@ void signalHandle(int signum) {
 		// send shutdown message
 		MESSAGE msg = { -1, SHUTDOWN, "" }; // shutdown data package
 		char buffer[sizeof(MESSAGE)];
-		memcpy(buffer, &msg, sizeof(MESSAGE);
+		memcpy(buffer, &msg, sizeof(MESSAGE));
 		int send_signal = send(client, buffer, sizeof(buffer), 0);
 		if (send_signal == -1) {
 			cout << "[ERROR]: Sending Failure: " + errno << endl;
@@ -168,7 +168,7 @@ int main() {
 		int option, dest_num;
 		string input;
 
-		cin >> option;
+		cin >> option; // get action 
 		switch (option)  {
 		case 1:
 			msg.OPTION = CONNECT;
@@ -183,7 +183,7 @@ int main() {
 			msg.OPTION = GETNAME;
 			break;
 		case 5:
-			msg.OPTION = GETLINK;
+			msg.OPTION = GETLIST;
 			break;
 		case 6:
 			msg.OPTION = SEND;
@@ -193,7 +193,7 @@ int main() {
 			cout << "Enter the message to be sent" << endl;
 			cout << "[message]: ";
 			cin >> input;
-			strcpy(msg.MSG, input.c_str());
+			strcpy_s(msg.MSG, input.c_str());
 			break;
 		case 7:
 			msg.OPTION = EXIT;
@@ -203,5 +203,23 @@ int main() {
 			cout << "Wrong Input" << endl;
 			break;
 		}
+		if (option < 1 || option > 7) { // invalid option
+			continue;
+		}
+		// display message
+		cout << "Message is sending ..." << endl;
+		cout << "* Type: " << REQUEST_STRING[msg.OPTION] << endl;
+		cout << "* Destination: " << msg.DESTINATION << endl;
+		cout << "*Message: " << msg.MSG << endl;
+
+		// send message
+		char buffer[sizeof(MESSAGE)];
+		memcpy(buffer, &msg, sizeof(MESSAGE));
+		int send_signal = send(client, buffer, sizeof(buffer), 0);
+		if (send_signal == -1) {
+			cout << "[ERROR]: Sending Failure: " << errno << endl;
+		}
 	}
+
+	return 0;
 }
