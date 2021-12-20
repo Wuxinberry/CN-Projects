@@ -157,6 +157,27 @@ void handleReceive(sockaddr_in addr, SOCKET client) {
 				cout << "Done." << endl;
 			}
 		}
+		if (recvMsg.OPTION == GETTIME) {
+			for (int i = 0; i < 99; i++) {
+				cout << "Send server time to " << client << endl;
+				cc = time(0);
+				cur_time = ctime(&cc);
+				strcpy_s(recvMsg.MSG, cur_time.c_str());
+
+				sendMsg.DESTINATION = client;
+				cout << "Replying ..." << endl;
+				text = recvMsg.MSG;
+				text = "Reply from server: \n" + text + "\nYour request has been processed";
+				strcpy_s(sendMsg.MSG, text.c_str());
+				send_signal = send(client, (char*)&sendMsg, sizeof(sendMsg), 0);
+				if (send_signal < 0) {
+					cout << "[ERROR]: Send failure: " << errno << endl;
+				}
+				else {
+					cout << "Done." << endl;
+				}
+			}
+		}
 	}
 	return;
 }
